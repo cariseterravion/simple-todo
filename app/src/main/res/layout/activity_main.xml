@@ -31,12 +31,13 @@
         android:layout_toLeftOf="@+id/btnAddItem"
         android:layout_toStartOf="@+id/btnAddItem" />
 
-    <ListView
-        android:layout_width="wrap_content"
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/lvItems"
         android:layout_alignRight="@+id/btnAddItem"
         android:layout_alignEnd="@+id/btnAddItem"
         android:layout_alignParentTop="true"
-        android:layout_above="@+id/btnAddItem" />
+        android:layout_above="@+id/btnAddItem"
+        android:scrollbars="vertical"/>
 </RelativeLayout>
