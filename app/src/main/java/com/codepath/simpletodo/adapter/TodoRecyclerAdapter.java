@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.codepath.simpletodo.R;
+import com.codepath.simpletodo.helper.DataHandler;
 import com.codepath.simpletodo.model.Todo;
 
 import java.util.List;
@@ -17,6 +18,8 @@ import java.util.List;
 public class TodoRecyclerAdapter extends RecyclerView.Adapter<TodoRecyclerAdapter.TodoViewHolder> {
     private List<Todo> mTodos;
 
+    private DataHandler mDataHandler;
+
     public class TodoViewHolder extends RecyclerView.ViewHolder {
         public TextView mTodoTextView;
         public TodoViewHolder(View v) {
@@ -25,8 +28,9 @@ public class TodoRecyclerAdapter extends RecyclerView.Adapter<TodoRecyclerAdapte
         }
     }
 
-    public TodoRecyclerAdapter(List<Todo> todos) {
+    public TodoRecyclerAdapter(List<Todo> todos, DataHandler dataHandler) {
         mTodos = todos;
+        mDataHandler = dataHandler;
     }
 
     @Override
@@ -42,6 +46,22 @@ public class TodoRecyclerAdapter extends RecyclerView.Adapter<TodoRecyclerAdapte
     public void onBindViewHolder(TodoViewHolder holder, int position) {
         Todo todo = mTodos.get(position);
         holder.mTodoTextView.setText(todo.text);
+        final int todoPosition = position;
+
+        holder.mTodoTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDataHandler.onEditItem(todoPosition);
+            }
+        });
+
+        holder.mTodoTextView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mDataHandler.deleteItem(todoPosition);
+                return true;
+            }
+        });
     }
 
     @Override
