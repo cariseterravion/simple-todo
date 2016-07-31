@@ -1,4 +1,4 @@
-package com.codepath.simpletodo;
+package com.codepath.simpletodo.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,16 +10,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
-import com.codepath.simpletodo.activity.EditItemActivity;
+import com.codepath.simpletodo.R;
 import com.codepath.simpletodo.adapter.TodoRecyclerAdapter;
-import com.codepath.simpletodo.helper.DataHandler;
-import com.codepath.simpletodo.helper.DividerItemDecoration;
 import com.codepath.simpletodo.model.Todo;
+import com.codepath.simpletodo.ui.DividerItemDecoration;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,13 +23,12 @@ import java.util.List;
  *
  * For CodePath
  */
-public class MainActivity extends AppCompatActivity implements DataHandler {
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getCanonicalName();
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-
     private List<Todo> mTodos;
 
     @Override
@@ -42,17 +36,21 @@ public class MainActivity extends AppCompatActivity implements DataHandler {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mTodos = new ArrayList<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.lvItems);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        readItems();
-
         mAdapter = new TodoRecyclerAdapter(mTodos, this);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST), 0);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     public void onAddItem(View v) {
@@ -60,14 +58,6 @@ public class MainActivity extends AppCompatActivity implements DataHandler {
         String itemText = etNewItem.getText().toString();
         addItem(itemText);
         etNewItem.setText("");
-    }
-
-    public void onEditItem(int position) {
-        Todo todo = mTodos.get(position);
-        Intent intent = new Intent(this, EditItemActivity.class);
-        intent.putExtra("todo_item_position", position);
-        intent.putExtra("todo_item_text", todo.text);
-        startActivityForResult(intent, 0);
     }
 
     @Override
@@ -92,54 +82,36 @@ public class MainActivity extends AppCompatActivity implements DataHandler {
         }
     }
 
-    @Override
     public void addItem(String itemText) {
         Todo newTodo = new Todo();
-        newTodo.text = itemText;
+        newTodo.content = itemText;
         Log.d(TAG, "new todo: "+itemText);
+        newTodo.save();
         mTodos.add(newTodo);
         mAdapter.notifyDataSetChanged();
-        writeItems();
     }
 
-    @Override
     public void deleteItem(int position) {
         Log.d(TAG, "delete todo at position "+position);
-        mTodos.remove(position);
+        Todo todo = mTodos.remove(position);
         mAdapter.notifyDataSetChanged();
-        writeItems();
+        todo.delete();
     }
 
-    @Override
+
+    public void onEditItem(int position) {
+        Todo todo = mTodos.get(position);
+        Intent intent = new Intent(this, EditItemActivity.class);
+        intent.putExtra("todo_item_position", position);
+        intent.putExtra("todo_item_text", todo.content);
+        startActivityForResult(intent, 0);
+    }
+
     public void editItem(String itemText, int position) {
-        Todo t = mTodos.get(position);
-        t.text = itemText;
+        Todo todo = mTodos.get(position);
+        todo.content = itemText;
         mAdapter.notifyDataSetChanged();
-        writeItems();
-    }
-
-    @Override
-    public void readItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        List<String> items;
-        try {
-            items = new ArrayList<>(FileUtils.readLines(todoFile));
-        } catch (IOException ioe) {
-            items = new ArrayList<>();
-        }
-        mTodos = Todo.fromText(items);
-    }
-
-    @Override
-    public void writeItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            FileUtils.writeLines(todoFile, Todo.toText(mTodos));
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
+        todo.save();
     }
 
 }

@@ -1,13 +1,14 @@
 package com.codepath.simpletodo.adapter;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.codepath.simpletodo.activity.MainActivity;
 import com.codepath.simpletodo.R;
-import com.codepath.simpletodo.helper.DataHandler;
 import com.codepath.simpletodo.model.Todo;
 
 import java.util.List;
@@ -16,9 +17,11 @@ import java.util.List;
  * Created by carise on 6/21/16.
  */
 public class TodoRecyclerAdapter extends RecyclerView.Adapter<TodoRecyclerAdapter.TodoViewHolder> {
-    private List<Todo> mTodos;
+    private static final String TAG = TodoRecyclerAdapter.class.getCanonicalName();
 
-    private DataHandler mDataHandler;
+    private List<Todo> mTodos;
+    private Context mContext;
+    private MainActivity mActivity;
 
     public class TodoViewHolder extends RecyclerView.ViewHolder {
         public TextView mTodoTextView;
@@ -28,9 +31,11 @@ public class TodoRecyclerAdapter extends RecyclerView.Adapter<TodoRecyclerAdapte
         }
     }
 
-    public TodoRecyclerAdapter(List<Todo> todos, DataHandler dataHandler) {
+    public TodoRecyclerAdapter(List<Todo> todos, Context ctx) {
         mTodos = todos;
-        mDataHandler = dataHandler;
+        mContext = ctx;
+        // TODO: fix this stupid hack
+        mActivity = (MainActivity) ctx;
     }
 
     @Override
@@ -42,23 +47,24 @@ public class TodoRecyclerAdapter extends RecyclerView.Adapter<TodoRecyclerAdapte
         return new TodoViewHolder(v);
     }
 
+    // TODO: refactor this to be in the ViewHolder
     @Override
     public void onBindViewHolder(TodoViewHolder holder, int position) {
         Todo todo = mTodos.get(position);
-        holder.mTodoTextView.setText(todo.text);
+        holder.mTodoTextView.setText(todo.content);
         final int todoPosition = position;
 
         holder.mTodoTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mDataHandler.onEditItem(todoPosition);
+                mActivity.onEditItem(todoPosition);
             }
         });
 
         holder.mTodoTextView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                mDataHandler.deleteItem(todoPosition);
+                mActivity.deleteItem(todoPosition);
                 return true;
             }
         });
@@ -68,4 +74,6 @@ public class TodoRecyclerAdapter extends RecyclerView.Adapter<TodoRecyclerAdapte
     public int getItemCount() {
         return mTodos.size();
     }
+
+
 }

@@ -1,4 +1,4 @@
-package com.codepath.simpletodo.helper;
+package com.codepath.simpletodo.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;

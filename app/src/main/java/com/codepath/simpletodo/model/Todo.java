@@ -1,41 +1,32 @@
 package com.codepath.simpletodo.model;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
 
-/**
- * Created by carise on 6/21/16.
- */
-public class Todo {
-    public String text;
+import java.sql.Timestamp;
+
+@Table(name="Todo")
+public class Todo extends Model {
+    @Column(name="todo_id", unique=true)
+    public Integer todoId;
+
+    @Column(name="content")
+    public String content;
+
+    @Column(name="due_date")
     public Timestamp dueDate;
+
+    @Column(name="create_date")
+    public Timestamp createDate;
+
+    @Column(name="remind_time")
     public Timestamp remindTime;
 
-    /**
-     * For now, working only with text so have this method
-     * @param todoTexts
-     * @return
-     */
-    public static List<Todo> fromText(List<String> todoTexts) {
-        List<Todo> todos = new ArrayList<>();
-        if (todoTexts != null) {
-            for (String text : todoTexts) {
-                Todo todo = new Todo();
-                todo.text = text;
-                todos.add(todo);
-            }
-        }
-        return todos;
-    }
+    @Column(name="user_id")
+    public Integer userId;
 
-    public static List<String> toText(List<Todo> todos) {
-        List<String> texts = new ArrayList<>();
-        if (todos != null) {
-            for (Todo todo : todos) {
-                texts.add(todo.text);
-            }
-        }
-        return texts;
+    public Todo() {
+        super();
     }
 }
