@@ -1,6 +1,7 @@
 package com.codepath.simpletodo.activity;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -11,12 +12,9 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.codepath.simpletodo.R;
-import com.codepath.simpletodo.adapter.TodoRecyclerAdapter;
+import com.codepath.simpletodo.adapter.TodoCursorRecyclerViewAdapter;
 import com.codepath.simpletodo.model.Todo;
 import com.codepath.simpletodo.ui.DividerItemDecoration;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author carise
@@ -27,24 +25,24 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getCanonicalName();
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private List<Todo> mTodos;
+    private TodoCursorRecyclerViewAdapter mAdapter;
+    private Cursor mCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTodos = new ArrayList<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.lvItems);
         mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mAdapter = new TodoRecyclerAdapter(mTodos, this);
+        mCursor = Todo.fetchResultCursor();
+        Log.d(TAG, "mCursor count: " + mCursor.getCount());
+        mAdapter = new TodoCursorRecyclerViewAdapter(this, mCursor);
         mRecyclerView.setAdapter(mAdapter);
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST), 0);
     }
 
@@ -87,31 +85,30 @@ public class MainActivity extends AppCompatActivity {
         newTodo.content = itemText;
         Log.d(TAG, "new todo: "+itemText);
         newTodo.save();
-        mTodos.add(newTodo);
-        mAdapter.notifyDataSetChanged();
+        mAdapter.changeCursor(mCursor);
     }
 
     public void deleteItem(int position) {
         Log.d(TAG, "delete todo at position "+position);
-        Todo todo = mTodos.remove(position);
+        //todo.delete();
         mAdapter.notifyDataSetChanged();
-        todo.delete();
     }
 
 
     public void onEditItem(int position) {
-        Todo todo = mTodos.get(position);
         Intent intent = new Intent(this, EditItemActivity.class);
         intent.putExtra("todo_item_position", position);
-        intent.putExtra("todo_item_text", todo.content);
+        //intent.putExtra("todo_item_text", todo.content);
         startActivityForResult(intent, 0);
     }
 
     public void editItem(String itemText, int position) {
+        /*
         Todo todo = mTodos.get(position);
         todo.content = itemText;
-        mAdapter.notifyDataSetChanged();
         todo.save();
+        */
+        mAdapter.changeCursor(mCursor);
     }
 
 }
