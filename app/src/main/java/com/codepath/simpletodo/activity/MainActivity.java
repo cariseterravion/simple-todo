@@ -1,7 +1,6 @@
 package com.codepath.simpletodo.activity;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -26,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private TodoCursorRecyclerViewAdapter mAdapter;
-    private Cursor mCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +34,8 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.lvItems);
         mRecyclerView.setHasFixedSize(true);
 
-        mCursor = Todo.fetchResultCursor();
-        Log.d(TAG, "mCursor count: " + mCursor.getCount());
-        mAdapter = new TodoCursorRecyclerViewAdapter(this, mCursor);
+        mAdapter = new TodoCursorRecyclerViewAdapter(this, Todo.fetchResultCursor());
         mRecyclerView.setAdapter(mAdapter);
-
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST), 0);
@@ -64,8 +59,6 @@ public class MainActivity extends AppCompatActivity {
             int position = data.getIntExtra("todo_item_position", -1);
             String text = data.getStringExtra("todo_item_text");
 
-            Log.d(TAG, "position="+position+", text="+text);
-
             if (text == null || text.trim().length() == 0) {
                 if (position > -1) {
                     deleteItem(position);
@@ -85,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         newTodo.content = itemText;
         Log.d(TAG, "new todo: "+itemText);
         newTodo.save();
-        mAdapter.changeCursor(mCursor);
+        mAdapter.changeCursor(Todo.fetchResultCursor());
     }
 
     public void deleteItem(int position) {
@@ -93,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
         //todo.delete();
         mAdapter.notifyDataSetChanged();
     }
-
 
     public void onEditItem(int position) {
         Intent intent = new Intent(this, EditItemActivity.class);
@@ -103,12 +95,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void editItem(String itemText, int position) {
-        /*
-        Todo todo = mTodos.get(position);
-        todo.content = itemText;
-        todo.save();
-        */
-        mAdapter.changeCursor(mCursor);
+        mAdapter.changeCursor(Todo.fetchResultCursor());
     }
-
 }

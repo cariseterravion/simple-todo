@@ -12,6 +12,7 @@ import android.view.ViewGroup;
  * from https://gist.github.com/skyfishjy/443b7448f59be978bc59
  */
 public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+    private static final String TAG = CursorRecyclerViewAdapter.class.getCanonicalName();
 
     private Context mContext;
     private Cursor mCursor;

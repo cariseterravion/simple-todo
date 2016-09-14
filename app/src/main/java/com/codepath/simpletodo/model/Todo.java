@@ -46,6 +46,7 @@ public class Todo extends Model {
     @Override
     public String toString() {
         return new StringBuilder("Todo={")
+                .append(" Id => ").append(getId()).append(", ")
                 .append(" todoId =>").append(todoId).append(", ")
                 .append(" content => ").append(content).append(" ,")
                 .append("}")
@@ -61,9 +62,7 @@ public class Todo extends Model {
     }
 
     public static Todo fromCursor(Cursor cursor) {
-        Todo todo = new Todo();
-        todo.todoId = cursor.getInt(cursor.getColumnIndexOrThrow("todo_id"));
-        todo.content = cursor.getString(cursor.getColumnIndexOrThrow("content"));
+        Todo todo = Todo.load(Todo.class, cursor.getInt(cursor.getColumnIndexOrThrow("_id")));
         Log.d("Todo", todo.toString());
         // TODO: get the other values
         return todo;
